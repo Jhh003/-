@@ -312,7 +312,7 @@
             {
                 id: 1,
                 name: "李箱 (Yi Sang)",
-                avatar: "",
+                avatar: "images/Yi_Sang-LCB.jpg",
                 color: '#9370DB',
                 personalities: [
                     "W公司3级清扫人员", "Seven协会南部6科", "N公司E.G.O:凶弹", 
@@ -325,7 +325,7 @@
             {
                 id: 2,
                 name: "浮士德 (Faust)",
-                avatar: "",
+                avatar: "images/Faust-LCB.jpg",
                 color: '#4169E1',
                 personalities: [
                     "し协会东部3科", "Zwei协会南部4科", "W公司2级清扫人员", 
@@ -338,7 +338,7 @@
             {
                 id: 3,
                 name: "堂吉诃德 (Don Quixote)",
-                avatar: "",
+                avatar: "images/Don_Quixote-LCB.jpg",
                 color: '#FF6347',
                 personalities: [
                     "し协会南部5科科长", "W公司3级清扫人员", "T公司3级征收人员", 
@@ -351,7 +351,7 @@
             {
                 id: 4,
                 name: "良秀 (Ryoshu)",
-                avatar: "",
+                avatar: "images/Ryoshu-LCB.jpg",
                 color: '#DC143C',
                 personalities: [
                     "W公司3级清扫人员", "Seven协会南部6科", "N公司E.G.O:轻蔑，敬畏", 
@@ -364,7 +364,7 @@
             {
                 id: 5,
                 name: "默尔索 (Meursault)",
-                avatar: "",
+                avatar: "images/Meursault-LCB.jpg",
                 color: '#708090',
                 personalities: [
                     "W公司2级清扫人员", "R公司第四集团军犀牛队", "N公司大锤", 
@@ -377,7 +377,7 @@
             {
                 id: 6,
                 name: "鸿璐 (Hong Lu)",
-                avatar: "",
+                avatar: "images/Hong_Lu-LCB.jpg",
                 color: '#228B22',
                 personalities: [
                     "W公司2级清扫人员", "R公司第四集团军驯鹿队", "LCB罪人", 
@@ -390,7 +390,7 @@
             {
                 id: 7,
                 name: "希斯克利夫 (Heathcliff)",
-                avatar: "",
+                avatar: "images/Heathcliff-LCB.jpg",
                 color: '#FF4500',
                 personalities: [
                       "し协会南部5科", "W公司4级清扫人员-CCA", "Seven协会南部4科", 
@@ -403,7 +403,7 @@
             {
                 id: 8,
                 name: "以实玛利 (Ishmael)",
-                avatar: "",
+                avatar: "images/Ishmael-LCB.jpg",
                 color: '#191970',
                 personalities: [
                    "し协会南部5科", "Zwei协会西部3科", "R公司第四集团军驯鹿队", 
@@ -416,7 +416,7 @@
             {
                 id: 9,
                 name: "罗佳 (Rodion)",
-                avatar: "",
+                avatar: "images/Rodion-LCB.jpg",
                 color: '#FF1493',
                 personalities: [
                  "Девять协会北部3科", "Zwei协会南部5科", "T公司2级征收人员", 
@@ -429,7 +429,7 @@
             {
                 id: 10,
                 name: "辛克莱 (Sinclair)",
-                avatar: "",
+                avatar: "images/Sinclair-LCB.jpg",
                 color: '#FFD700',
                 personalities: [
                   "Девять协会北部3科", "Zwei协会西部3科", "Zwei协会南部6科", 
@@ -442,7 +442,7 @@
             {
                 id: 11,
                 name: "格里高尔 (Gregor)",
-                avatar: "",
+                avatar: "images/Gregor-LCB.jpg",
                 color: '#8B4513',
                 personalities: [
                    "Zwei协会南部4科", "LCB罪人", "G公司科长代理", 
@@ -455,7 +455,7 @@
             {
                 id: 12,
                 name: "奥提斯 (Outis)",
-                avatar: "",
+                avatar: "images/Outis-LCB.jpg",
                 color: '#008080',
                 personalities: [
                     "W公司3级清扫组长", "T公司3级强制征收人员", "Seven协会南部6科科长", 
@@ -507,10 +507,17 @@
                 const content = document.createElement('div');
                 content.className = 'scroll-item-content';
                 
-                const avatarPlaceholder = document.createElement('div');
-                avatarPlaceholder.className = 'avatar-placeholder';
-                avatarPlaceholder.textContent = '?';
-                content.appendChild(avatarPlaceholder);
+                // 创建头像元素
+                const avatarElement = document.createElement('img');
+                avatarElement.className = 'avatar-placeholder';
+                const sinnerInfo = sinnerData.find(s => s.name === items[i % items.length]);
+                if (sinnerInfo && sinnerInfo.avatar) {
+                    avatarElement.src = sinnerInfo.avatar;
+                    avatarElement.alt = sinnerInfo.name;
+                } else {
+                    avatarElement.textContent = '?';
+                }
+                content.appendChild(avatarElement);
                 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = items[i % items.length];
@@ -535,10 +542,17 @@
                 const content = document.createElement('div');
                 content.className = 'scroll-item-content';
                 
-                const avatarPlaceholder = document.createElement('div');
-                avatarPlaceholder.className = 'avatar-placeholder';
-                avatarPlaceholder.textContent = '?';
-                content.appendChild(avatarPlaceholder);
+                // 创建头像元素
+                const avatarElement = document.createElement('img');
+                avatarElement.className = 'avatar-placeholder';
+                const sinnerInfo = sinnerData.find(s => s.name === items[i % items.length]);
+                if (sinnerInfo && sinnerInfo.avatar) {
+                    avatarElement.src = sinnerInfo.avatar;
+                    avatarElement.alt = sinnerInfo.name;
+                } else {
+                    avatarElement.textContent = '?';
+                }
+                content.appendChild(avatarElement);
                 
                 const textSpan = document.createElement('span');
                 textSpan.textContent = items[i % items.length];
@@ -725,9 +739,4 @@
         window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-
 </html>
-
-
-
-
