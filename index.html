@@ -2495,7 +2495,7 @@
     </script>
     
     <!-- LeanCloud SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.17.0/dist/av-min.js"></script>
+    <script src="//code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
     
     <script>
         // LeanCloud配置
@@ -2526,6 +2526,9 @@
                         appKey: APP_KEY,
                         serverURL: SERVER_URL
                     });
+                    // LeanCloud对象解构
+                    window.Query = AV.Query;
+                    window.User = AV.User;
                     console.log('LeanCloud初始化成功');
                     resolve();
                 } catch (error) {

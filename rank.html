@@ -128,10 +128,10 @@
     <script src="//code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
     
     <script>
-        // LeanCloud配置
-        const APP_ID = "23WBNLRoympdUyZdwnxzSI0i-MdYXbMMI";
-        const APP_KEY = "wtSe16WHzyp8TIxoKZE2msvo";
-        const SERVER_URL = "https://23wbnlro.lc-cn-n1-shared.com";
+        // LeanCloud配置 - 请替换为您自己的LeanCloud应用凭据
+        const APP_ID = "your_app_id"; // 替换为您的App ID
+        const APP_KEY = "your_app_key"; // 替换为您的App Key
+        const SERVER_URL = "https://your_server_url.lc-cn-n1-shared.com"; // 替换为您的服务器地址
         
         // 初始化LeanCloud
         function initLeanCloud() {
@@ -156,6 +156,9 @@
                         appKey: APP_KEY,
                         serverURL: SERVER_URL
                     });
+                    // LeanCloud对象解构
+                    window.Query = AV.Query;
+                    window.User = AV.User;
                     console.log('LeanCloud初始化成功');
                     resolve();
                 } catch (error) {
