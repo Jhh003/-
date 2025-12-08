@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排行榜 - Limbus Company</title>
+    <style>
+        /* 排行榜页面样式 */
+        #leaderboard-page {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            padding: 20px;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .leaderboard-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .leaderboard-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        
+        .leaderboard-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        /* 返回首页按钮 */
+        .back-home {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .back-home:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- 排行榜页面 -->
+    <div id="leaderboard-page">
+        <button class="close-btn" onclick="closeLeaderboard()">&times;</button>
+        <h2 class="page-title">排行榜</h2>
+        
+        <div class="leaderboard-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>用户名</th>
+                        <th>时间</th>
+                        <th>日期</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr><td colspan="4" class="no-data">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <button class="back-home" onclick="window.location.href='index.html'">返回首页</button>
+    </div>
+    
+    <!-- LeanCloud SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.17.0/dist/av-min.js"></script>
+    
+    <script>
+        // LeanCloud配置
+        const APP_ID = "0nq2Vx9hLt32hN59Zt0p0GtA-gzGzoHsz";
+        const APP_KEY = "4H7qU79c4bE69I44K55QpIuZ";
+        const SERVER_URL = "https://0nq2vx9h.lc-cn-n1-shared.com";
+        
+        // 初始化LeanCloud
+        function initLeanCloud() {
+            return new Promise((resolve, reject) => {
+                // 检查是否已经初始化
+                if (typeof AV !== 'undefined' && AV.applicationId) {
+                    console.log('LeanCloud已初始化');
+                    resolve();
+                    return;
+                }
+                
+                // 检查是否已加载SDK
+                if (typeof AV === 'undefined') {
+                    console.error('LeanCloud SDK未加载');
+                    reject(new Error('LeanCloud SDK未加载'));
+                    return;
+                }
+                
+                try {
+                    AV.init({
+                        appId: APP_ID,
+                        appKey: APP_KEY,
+                        serverURL: SERVER_URL
+                    });
+                    console.log('LeanCloud初始化成功');
+                    resolve();
+                } catch (error) {
+                    console.error('LeanCloud初始化失败:', error);
+                    reject(error);
+                }
+            });
+        }
+        
+        // 格式化时间
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return '00:00.00';
+            
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(remainingSeconds.toFixed(2)).padStart(5, '0');
+            
+            return `${formattedMinutes}:${formattedSeconds}`;
+        }
+        
+        // 加载排行榜数据
+        async function loadLeaderboardData() {
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            
+            try {
+                // 初始化LeanCloud
+                await initLeanCloud();
+                
+                // 使用LeanCloud专业排行榜SDK
+                const leaderboard = AV.Leaderboard.createWithoutData('time');
+                const rankings = await leaderboard.getResults({
+                    limit: 100,
+                    includeUser: true
+                });
+                
+                console.log('排行榜数据加载成功:', rankings);
+                
+                // 生成排行榜HTML
+                let html = '';
+                rankings.forEach((ranking, index) => {
+                    const user = ranking.user ? (ranking.user.username || '匿名用户') : '匿名用户';
+                    const time = formatTime(ranking.value);
+                    const date = new Date(ranking.updatedAt).toLocaleString();
+                    
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${user}</td>
+                            <td>${time}</td>
+                            <td>${date}</td>
+                        </tr>
+                    `;
+                });
+                
+                leaderboardBody.innerHTML = html;
+            } catch (error) {
+                console.error('加载排行榜数据失败:', error);
+                leaderboardBody.innerHTML = '<tr><td colspan="4" class="no-data">加载排行榜数据失败，请稍后重试</td></tr>';
+            }
+        }
+        
+        // 关闭排行榜
+        function closeLeaderboard() {
+            document.getElementById('leaderboard-page').style.display = 'none';
+        }
+        
+        // 显示排行榜
+        function showLeaderboard() {
+            document.getElementById('leaderboard-page').style.display = 'block';
+            loadLeaderboardData();
+        }
+        
+        // 页面加载完成后自动显示排行榜
+        document.addEventListener('DOMContentLoaded', function() {
+            showLeaderboard();
+        });
+    </script>
+</body>
+</html>
