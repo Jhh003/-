@@ -2542,28 +2542,52 @@
                 await initLeanCloud();
                 
                 // 获取当前用户
-                const currentUser = AV.User.current();
+                let currentUser = AV.User.current();
                 
-                // 如果用户未登录，弹出提示
+                // 如果用户未登录，创建临时用户
                 if (!currentUser) {
-                    alert('请先登录LeanCloud账号，才能上传时间记录');
-                    return;
+                    console.log('用户未登录，正在创建临时用户...');
+                    const username = 'anon_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                    const password = Math.random().toString(36).slice(2) + Date.now().toString(36);
+                    
+                    // 创建并登录临时用户
+                    currentUser = new AV.User();
+                    currentUser.setUsername(username);
+                    currentUser.setPassword(password);
+                    await currentUser.signUp();
+                    
+                    console.log('临时用户创建成功:', currentUser);
                 }
                 
-                console.log('当前用户:', currentUser);
+                // 获取elapsedTime变量
+                // 由于作用域问题，我们需要从计时器显示中解析时间
+                const timerDisplay = document.getElementById('timer-control-display') || document.getElementById('timer-display');
+                if (!timerDisplay) {
+                    throw new Error('计时器显示元素未找到');
+                }
+                
+                const timeStr = timerDisplay.textContent;
+                console.log('当前时间显示:', timeStr);
+                
+                // 解析时间字符串为毫秒
+                const [minutes, seconds] = timeStr.split(':');
+                const [sec, ms] = seconds.split('.');
+                const totalMilliseconds = parseInt(minutes) * 60 * 1000 + parseInt(sec) * 1000 + parseInt(ms) * 10;
+                
+                console.log('解析后的时间（毫秒）:', totalMilliseconds);
                 
                 // 更新用户的时间统计
-                // 使用LeanCloud专业排行榜SDK
+                // 使用LeanCloud专业排行榜SDK，将毫秒转换为秒
                 const leaderboard = AV.Leaderboard.createWithoutData('time');
                 await leaderboard.updateStatistics(currentUser, {
-                    time: elapsedTime
+                    time: totalMilliseconds / 1000 // 转换为秒
                 });
                 
                 console.log('时间记录上传成功');
                 alert('时间记录已成功上传到排行榜！');
             } catch (error) {
                 console.error('上传时间记录失败:', error);
-                alert('上传时间记录失败，请稍后重试');
+                alert('上传时间记录失败：' + error.message + '，请稍后重试');
             }
         }
     </script>
